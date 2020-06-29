@@ -23,7 +23,7 @@ int main(int argc,const char *argv[]){
 
 SplayTree Initialize(void){
     if(NullNode == NULL){
-        NullNode = malloc(sizeof(struct SplayNode));
+        NullNode = (Position)malloc(sizeof(struct SplayNode));
         NullNode->Left = NullNode->Right = NullNode;
     }
     return NullNode;
@@ -71,6 +71,49 @@ SplayTree Splay(ElementType Item,Position X){
     X->Right = Header.Left;
     
     return X;
+}
+
+SplayTree Insert(ElementType Item , SplayTree T){
+    Position NewNode = (Position)malloc(sizeof(struct SplayNode));
+    NewNode->Element = Item;
+    if( T== NullNode){
+        NewNode->Left = NewNode->Right = NullNode;
+        T = NewNode;
+    }else{
+        T = Splay( Item, T );
+        if( Item < T->Element){
+            NewNode->Left = T->Left;
+            NewNode->Right = T;
+            T->Left = NullNode;
+            T = NewNode;
+        }else if( Item > T->Element){
+            NewNode->Right = T->Right;
+            NewNode->Left = T;
+            T->Right = NullNode;
+            T = NewNode;
+        }else 
+            return T; /* The Item is already in the SplayTree */
+    }
+    return T;
+}
+
+SplayTree Remove(ElementType Item, SplayTree T ){
+    Position NewTree;
+    if( T != NullNode ){
+        T = Splay( Item ,T );
+        if( Item == T->Element ){
+            if( T->Left == NullNode )
+                NewTree = T->Right;
+            else {
+                NewTree = T->Left;
+                NewTree = Splay( Item , NewTree);/* All elements in left subtree is smaller than Item , the NewTree's root is T's LeftChild  */
+                NewTree->Right = T->Right;      /* The NewTree's right subtree is empty */
+            }
+            free(T);
+            T = NewTree;  
+        }
+    }
+    return T;
 }
 
 
